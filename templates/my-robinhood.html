@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <style>
+        .data {
+            display: none;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+
+                <h1>My watchlist</h1>
+                <ul>
+                    {% for name in ticker %}
+                    <li>{{ name }}</li>
+                    {% endfor %}
+                </ul>
+
+
+                <div class="dataset">
+                    {% for datarow in charts %}
+                    {% for row in datarow %}
+                    {% if loop.index == 1 %}
+                    <h3>{{ row }}</h3>
+                    <canvas id="{{row}}"></canvas>
+                    {% elif loop.index == 4 %}
+                    <p class="data">{{ row }}</p>
+                    {% endif %}
+                    {% endfor %}
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div style="text-align: center;position: sticky;top: 0;"><img src="https://www.investopedia.com/thmb/jXSXTUNMoPyncVwx9RO_rF-zOZI=/2378x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/Triangles_AShortStudyinContinuationPatterns1-bba0f7388b284f96b90ead2b090bf9a8.png" style="max-width:400px; width: 100%; margin: auto;" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+        function addData(chart, label, data) {
+            data = JSON.parse(data);
+            for (var i = 0; i < data.length; i++) {
+                var obj = data[i];
+                obj.x = parseFloat(obj.x);
+                obj.y = parseFloat(obj.y);
+            }
+            console.log(chart);
+            console.log(data);
+            chart.data.labels.push(label);
+            chart.data.datasets.forEach((dataset) => {
+                dataset.data.push(data);
+            });
+            chart.update();
+        }
+
+        $(document).ready(function() {
+
+
+
+            var names = []
+            $('.dataset').find('h3').each(function(index) {
+                //console.log($(this).text());
+                var theID = $.find('#' + $(this).text());
+                var theName = $(this).text();
+                var theData = $(this).next().next().text();
+                var ctx = document.getElementById(theName).getContext('2d');
+                var data = JSON.parse(theData);
+                for (var i = 0; i < data.length; i++) {
+                    var obj = data[i];
+                    obj.x = parseFloat(obj.x);
+                    obj.y = parseFloat(obj.y);
+                }
+                var chart = new Chart(ctx, {
+                    // The type of chart we want to create
+                    type: 'scatter',
+                    // The data for our dataset
+                    data: {
+                        datasets: [{
+                            label: theName,
+                            backgroundColor: 'rgb(255, 99, 66)',
+                            borderColor: 'rgb(5, 99, 132)',
+                            fill: true,
+                            showLine: true,
+                            data: data
+                        }]
+                    },
+
+                    // Configuration options go here
+                    options: {}
+                });
+                //console.log(chart);
+                //addData(chart, theName, theData);
+
+            });
+        });
+
+    </script>
+
+</body>
+
+</html>
